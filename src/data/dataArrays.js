@@ -262,7 +262,7 @@ export const recipes = [
     categoryId: 0,
     title: "Classic Lasagna",
     photo_url:
-      "https://namelymarly.com/wp-content/uploads/2018/04/20180415_Beet_Lasagna_10.jpg",
+      "https://namelymarly.com/wp-content/uploads/2023/04/Vegan-Chocolate-Orange-Cake-1730-Edit-web.jpg",
     photosArray: [
       "https://namelymarly.com/wp-content/uploads/2018/04/20180415_Beet_Lasagna_10.jpg",
       "https://advancelocal-adapter-image-uploads.s3.amazonaws.com/image.al.com/home/bama-media/width600/img/news_impact/photo/burger-fijpg-57e7e5907630c2ad.jpg",
@@ -448,7 +448,8 @@ export const ingredients = [
   {
     ingredientId: 18,
     name: "Water",
-    photo_url: "https://ak1.picdn.net/shutterstock/videos/829561/thumb/11.jpg",
+    photo_url:
+      "https://post.healthline.com/wp-content/uploads/2020/06/glass-drinking-water-732x549-thumbnail-1.jpg",
   },
   {
     ingredientId: 19,
@@ -616,7 +617,7 @@ export const ingredients = [
     ingredientId: 47,
     name: "celery stalks",
     photo_url:
-      "https://cdn4.eyeem.com/thumb/6d1b3957c7caa9b73c3e0f820ef854b931808139-1538043742765/w/750",
+      "https://www.savoryexperiments.com/wp-content/uploads/2020/05/celery.jpg",
   },
   {
     ingredientId: 48,
@@ -687,7 +688,7 @@ export const ingredients = [
     ingredientId: 59,
     name: "Banana",
     photo_url:
-      "https://www.conservationmagazine.org/wp-content/uploads/2013/04/sterile-banana.jpg",
+      "https://www.eatthis.com/wp-content/uploads/sites/4/2021/07/bananas.jpg?quality=82&strip=all",
   },
   {
     ingredientId: 60,

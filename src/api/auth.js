@@ -1,11 +1,11 @@
-import { BE_URL } from "../lib/config";
+import { BASE_URL } from "../lib/config";
 import { fetcher } from "../lib/fetcher";
 
 // const API_URL = `${BE_URL}`;
 
 export async function login(username, password) {
   console.log(username, password);
-  const data = await fetcher(`http://192.168.1.3:5000/auth/login`, {
+  const data = await fetcher(`${BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     // headers: {
@@ -22,7 +22,7 @@ export async function login(username, password) {
 
 export async function register(username, password, fullname, email) {
   console.log(username, password);
-  const data = await fetcher(`http://192.168.1.3:5000/auth/register`, {
+  const data = await fetcher(`${BASE_URL}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
