@@ -4,7 +4,6 @@ import {
   Text,
   View,
   Image,
-  TouchableHighlight,
   Pressable,
   TouchableOpacity,
 } from "react-native";
@@ -65,6 +64,7 @@ export default function SearchScreen(props) {
     var recipeArray3 = getRecipesByIngredientName(text);
     var aux = recipeArray1.concat(recipeArray2);
     var recipeArray = [...new Set(aux)];
+    console.log("recipeArray : ", recipeArray);
 
     if (text == "") {
       setData([]);

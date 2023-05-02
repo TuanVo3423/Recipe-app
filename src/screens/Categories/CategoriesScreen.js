@@ -1,12 +1,11 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { FlatList, Text, View, Image, TouchableOpacity } from "react-native";
 import styles from "./styles";
-import { categories } from "../../data/dataArrays";
 import getCategories from "../../api/getCategories";
-import { getNumberOfRecipes } from "../../data/MockDataAPI";
 import MenuImage from "../../components/MenuImage/MenuImage";
 import useCategoriesStore from "../../stores/useCategoriesStore";
 import { useQuery } from "@tanstack/react-query";
+import useGetRecipesStore from "../../stores/useGetRecipesStore";
 
 export default function CategoriesScreen(props) {
   const { navigation } = props;
@@ -19,10 +18,12 @@ export default function CategoriesScreen(props) {
     queryKey: ["categories"],
     queryFn: async () =>
       getCategories().then((data) => {
-        setCategoriesStore(data.categories);
         return data.categories;
       }),
   });
+  const getNumberOfRecipes = useGetRecipesStore(
+    (state) => state.getNumberOfRecipes
+  );
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -43,33 +44,35 @@ export default function CategoriesScreen(props) {
   const onPressCategory = (item) => {
     const title = item.name;
     const category = item;
-    console.log(title, category);
+    // console.log(title, category);
     navigation.navigate("RecipesList", { category, title });
   };
 
-  const renderCategory = ({ item }) => (
-    <TouchableOpacity onPress={() => onPressCategory(item)}>
-      <View style={styles.categoriesItemContainer}>
-        <Image
-          style={styles.categoriesPhoto}
-          source={{ uri: item.photo_url }}
-        />
-        <Text style={styles.categoriesName}>{item.name}</Text>
-        <Text style={styles.categoriesInfo}>
-          {getNumberOfRecipes(item.categoryId)} recipes
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderCategory = ({ item }) => {
+    const number = getNumberOfRecipes(item.categoryId);
+    console.log("number : ", number);
+    return (
+      <TouchableOpacity onPress={() => onPressCategory(item)}>
+        <View style={styles.categoriesItemContainer}>
+          <Image
+            style={styles.categoriesPhoto}
+            source={{ uri: item.photo_url }}
+          />
+          <Text style={styles.categoriesName}>{item.name}</Text>
+          <Text style={styles.categoriesInfo}>{number} recipes</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
   if (isLoading) {
     return <Text>Loading</Text>;
   }
 
   return (
     <View>
-      {categoriesStore && (
+      {data && (
         <FlatList
-          data={categoriesStore}
+          data={data}
           renderItem={renderCategory}
           keyExtractor={(item) => `${item.categoryId}`}
         />

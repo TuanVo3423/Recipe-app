@@ -13,6 +13,7 @@ import {
 } from "native-base";
 import { register } from "../../api/auth";
 import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function RegisterScreen(props) {
   const { navigation } = props;
   const toast = useToast();
@@ -51,29 +52,28 @@ export default function RegisterScreen(props) {
     });
   };
   const onRegisterPress = () => {
-    // if (!emailRegex.test(input.email)) {
-    //   toast.show({
-    //     render: () => {
-    //       return (
-    //         <Box bg="red.500" px="5" py="3" rounded="md" mb={5}>
-    //           <Text color="white">Please enter a valid email format!</Text>
-    //         </Box>
-    //       );
-    //     },
-    //   });
-    // }
     register(input.username, input.password, input.fullname, input.email).then(
       (res) => {
         if (res.type === "success") {
-          toast.show({
-            render: () => {
-              return (
-                <Box bg="green.500" px="5" py="3" rounded="md" mb={5}>
-                  <Text color="white">{res.message}</Text>
-                </Box>
-              );
-            },
+          AsyncStorage.setItem("auth", "success", (error) => {
+            if (error) {
+              console.log("Error retrieving data: ", error);
+            } else {
+              AsyncStorage.setItem("name", input.username, (error) => {
+                navigation.navigate("Home", res.message);
+              });
+              toast.show({
+                render: () => {
+                  return (
+                    <Box bg="green.500" px="5" py="3" rounded="md" mb={5}>
+                      <Text color="white">{res.message}</Text>
+                    </Box>
+                  );
+                },
+              });
+            }
           });
+
           navigation.navigate("Home", res.message);
         } else {
           toast.show({
@@ -84,6 +84,8 @@ export default function RegisterScreen(props) {
                 </Box>
               );
             },
+            duration: 2000,
+            isClosable: true,
           });
         }
         return;

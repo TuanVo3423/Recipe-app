@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   ScrollView,
   Text,
@@ -9,33 +9,24 @@ import {
 } from "react-native";
 import styles from "./styles";
 import Carousel, { Pagination } from "react-native-snap-carousel";
-import { getIngredientName, getCategoryName } from "../../data/MockDataAPI";
 import BackButton from "../../components/BackButton/BackButton";
 import ViewIngredientsButton from "../../components/ViewIngredientsButton/ViewIngredientsButton";
 import { useQuery } from "@tanstack/react-query";
-import getCategories, { getCategoryById } from "../../api/getCategories";
+import { getCategoryById } from "../../api/getCategories";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 export default function RecipeScreen(props) {
   const { navigation, route } = props;
   const item = route.params?.item;
-  // const item = ;
-  // const categoryId = item.categoryId;
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
       const categoryId = item.categoryId;
       const data = await getCategoryById(categoryId);
-      return data;
+      return data.category;
     },
-    onSuccess: () => {
-      console.log("data : ", data);
-      // setRecipesStore(data.Recipes);
-    },
-    // enabled: !!categoryId,
   });
-  console.log(isLoading, isError);
 
   const [activeSlide, setActiveSlide] = useState(0);
 
@@ -63,11 +54,11 @@ export default function RecipeScreen(props) {
     </TouchableHighlight>
   );
 
-  const onPressIngredient = (item) => {
-    var name = getIngredientName(item);
-    let ingredient = item;
-    navigation.navigate("Ingredient", { ingredient, name });
-  };
+  // const onPressIngredient = (item) => {
+  //   var name = getIngredientName(item);
+  //   let ingredient = item;
+  //   navigation.navigate("Ingredient", { ingredient, name });
+  // };
   if (isLoading) {
     return <Text>Loading</Text>;
   } else {
@@ -110,9 +101,7 @@ export default function RecipeScreen(props) {
             <TouchableHighlight
               onPress={() => navigation.navigate("RecipesList", { data })}
             >
-              <Text style={styles.category}>
-                {getCategoryName(item.categoryId).toUpperCase()}
-              </Text>
+              <Text style={styles.category}>{data.name.toUpperCase()}</Text>
             </TouchableHighlight>
           </View>
 

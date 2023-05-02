@@ -9,45 +9,57 @@ import {
   ImageBackground,
 } from "react-native";
 import styles from "./styles";
-import { recipes } from "../../data/dataArrays";
 import MenuImage from "../../components/MenuImage/MenuImage";
-import { getCategoryName } from "../../data/MockDataAPI";
-import getCategories from "../../api/getCategories";
 import getRecipes from "../../api/getRecipes";
-import axios from "axios";
 import useGetRecipesStore from "../../stores/useGetRecipesStore";
 import useCategoriesStore from "../../stores/useCategoriesStore";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar, Box, Stack } from "native-base";
-import useGetAuthStore from "../../stores/useGetAuthStore";
+import { Avatar, Stack } from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import getIngredients from "../../api/getIngredients";
+import useIngredientsStore from "../../stores/useIngredientsStore";
+import getCategories from "../../api/getCategories";
 
 export default function HomeScreen(props) {
   const { navigation } = props;
-  const recipesStore = useGetRecipesStore((state) => state.recipes);
   const setRecipesStore = useGetRecipesStore((state) => state.setRecipesStore);
-  const authStore = useGetAuthStore((state) => state.authStore);
-  const { isLoading, isError, data, error } = useQuery({
+  const setIngredientsStore = useIngredientsStore(
+    (state) => state.setIngredientsStore
+  );
+  const setCategoriesStore = useCategoriesStore(
+    (state) => state.setCategoriesStore
+  );
+  const categorieyByID = useCategoriesStore((state) => state.getCategoryById);
+  const {
+    isLoading,
+    isError,
+    data: recipesData,
+    error,
+  } = useQuery({
     queryKey: ["recipes"],
     queryFn: async () =>
       getRecipes().then((res) => {
         setRecipesStore(res.Recipes);
         return res.Recipes;
       }),
+  });
 
-    // queryFn: async () => {
-    //   getRecipes().then((data) => {
-    //     setRecipesStore(data.Recipes);
-    //   });
-    //   // .catch();
-    // },
-    // onSuccess: () => {
-    //   console.log("data : ", data);
-    //   setRecipesStore(data.Recipes);
-    // },
-    // onError: () => {
-    //   console.log(error);
-    // },
+  const { isLoading: ingredientLoading, data: ingredientData } = useQuery({
+    queryKey: ["ingredients"],
+    queryFn: async () =>
+      getIngredients().then((res) => {
+        setIngredientsStore(res.ingredient);
+        return res.ingredient;
+      }),
+  });
+
+  const { isLoading: categoriesLoading, data: categoriesData } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () =>
+      getCategories().then((res) => {
+        setCategoriesStore(res.categories);
+        return res.categories;
+      }),
   });
 
   useLayoutEffect(() => {
@@ -87,15 +99,19 @@ export default function HomeScreen(props) {
     navigation.navigate("Recipe", { item });
   };
 
-  const renderRecipes = ({ item }) => (
-    <TouchableOpacity onPress={() => onPressRecipe(item)}>
-      <View style={styles.container}>
-        <Image style={styles.photo} source={{ uri: item.photo_url }} />
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.category}>{getCategoryName(item.categoryId)}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderRecipes = ({ item }) => {
+    const { name } = categorieyByID(item.categoryId);
+
+    return (
+      <TouchableOpacity onPress={() => onPressRecipe(item)}>
+        <View style={styles.container}>
+          <Image style={styles.photo} source={{ uri: item.photo_url }} />
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.category}>{name}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
   if (isLoading) {
     return (
       <ImageBackground source="../../../assets/adaptive-icon.png"></ImageBackground>
@@ -103,12 +119,12 @@ export default function HomeScreen(props) {
   } else {
     return (
       <View>
-        {recipesStore && (
+        {recipesData && (
           <FlatList
             vertical
             showsVerticalScrollIndicator={false}
             numColumns={2}
-            data={recipesStore}
+            data={recipesData}
             renderItem={renderRecipes}
             keyExtractor={(item) => `${item.recipeId}`}
           />

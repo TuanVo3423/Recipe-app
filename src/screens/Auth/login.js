@@ -59,6 +59,8 @@ export default function LoginScreen(props) {
                 </Box>
               );
             },
+            duration: 2000,
+            isClosable: true,
           });
           AsyncStorage.setItem("auth", "success", (error) => {
             if (error) {

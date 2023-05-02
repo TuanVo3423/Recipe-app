@@ -15,7 +15,21 @@ export default async function getRecipes() {
 }
 
 export async function getRecipeByIngerdientId(ingredientId) {
-  const response = await fetcher(`${BASE_URL}/ingredient/${ingredientId}`, {
+  const response = await fetcher(
+    `${BASE_URL}/recipes/ingredient/${ingredientId}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return response;
+}
+
+export async function getRecipeByCategoryId(categoryId) {
+  const response = await fetcher(`${BASE_URL}/recipes/category/${categoryId}`, {
     method: "GET",
     headers: {
       Accept: "application/json",

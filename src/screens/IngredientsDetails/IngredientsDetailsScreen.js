@@ -1,23 +1,23 @@
-import React, { useLayoutEffect } from "react";
-import {
-  FlatList,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import React, { useEffect, useLayoutEffect } from "react";
+import { FlatList, Text, View, Image, TouchableOpacity } from "react-native";
 import styles from "./styles";
-import { getIngredientName, getAllIngredients } from "../../data/MockDataAPI";
+import useIngredientsStore from "../../stores/useIngredientsStore";
 
 export default function IngredientsDetailsScreen(props) {
   const { navigation, route } = props;
+  const ingredientsArray = useIngredientsStore(
+    (state) => state.ingredientsArray
+  );
+  const getIngredientsStoreById = useIngredientsStore(
+    (state) => state.getIngredientsStoreById
+  );
+  const getIngredientById = useIngredientsStore(
+    (state) => state.getIngredientById
+  );
 
-  const item = route.params?.ingredients;
-  const ingredientsArray = getAllIngredients(item);
-  // console.log(ingredientsArray);
-  console.log("trang nay");
-
+  useEffect(() => {
+    getIngredientsStoreById(route.params?.ingredients);
+  }, [route.params?.ingredients]);
   useLayoutEffect(() => {
     navigation.setOptions({
       title: route.params?.title,
@@ -28,9 +28,13 @@ export default function IngredientsDetailsScreen(props) {
   }, []);
 
   const onPressIngredient = (item) => {
-    let name = getIngredientName(item.ingredientId);
+    const ingredientByID = getIngredientById(item.ingredientId);
     let ingredient = item.ingredientId;
-    navigation.navigate("Ingredient", { ingredient, name });
+    console.log("ingredientByID: ", ingredientByID, ingredient);
+    navigation.navigate("Ingredient", {
+      ingredient,
+      name: ingredientByID.name,
+    });
   };
 
   const RenderIngredient = ({ item }) => {
@@ -51,13 +55,17 @@ export default function IngredientsDetailsScreen(props) {
   };
 
   return (
-    <FlatList
-      vertical
-      showsVerticalScrollIndicator={false}
-      numColumns={3}
-      data={ingredientsArray}
-      renderItem={RenderIngredient}
-      keyExtractor={(item) => `${item[0].ingredientId}`}
-    />
+    <>
+      {ingredientsArray && (
+        <FlatList
+          vertical
+          showsVerticalScrollIndicator={false}
+          numColumns={3}
+          data={ingredientsArray}
+          renderItem={RenderIngredient}
+          keyExtractor={(item) => `${item[0].ingredientId}`}
+        />
+      )}
+    </>
   );
 } //

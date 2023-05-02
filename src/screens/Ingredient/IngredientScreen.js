@@ -2,33 +2,33 @@ import React, { useLayoutEffect } from "react";
 import { FlatList, Text, View, Image, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-virtualized-view";
 import styles from "./styles";
-import {
-  getIngredientUrl,
-  getRecipesByIngredient,
-  getCategoryName,
-} from "../../data/MockDataAPI";
 import { useQuery } from "@tanstack/react-query";
 import { getRecipeByIngerdientId } from "../../api/getRecipes";
+import useIngredientsStore from "../../stores/useIngredientsStore";
+import useCategoriesStore from "../../stores/useCategoriesStore";
 
 export default function IngredientScreen(props) {
   const { navigation, route } = props;
+  const getIngredientById = useIngredientsStore(
+    (state) => state.getIngredientById
+  );
+  const getCategoryById = useCategoriesStore((state) => state.getCategoryById);
 
-  const ingredientId = route.params?.ingredient;
-  const ingredientUrl = getIngredientUrl(ingredientId);
+  const { photo_url } = getIngredientById(route.params?.ingredient);
   const ingredientName = route.params?.name;
-  console.log("Ingredient");
-  const { isLoading, isError, data, error } = useQuery({
+  const {
+    isLoading,
+    isError,
+    data: RecipeByIngerdientIdData,
+    error,
+  } = useQuery({
     queryKey: ["ingredient"],
     queryFn: async () => {
-      const ingredientId = route.params?.ingredient;
-      const data = await getRecipeByIngerdientId(ingredientId);
+      const data = await getRecipeByIngerdientId(route.params?.ingredient);
       return data;
     },
-    onSuccess: () => {
-      console.log("data : ", data);
-      // setRecipesStore(data.Recipes);
-    },
   });
+  console.log("RecipeByIngerdientIdData:", RecipeByIngerdientIdData);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -40,25 +40,26 @@ export default function IngredientScreen(props) {
     navigation.navigate("Recipe", { item });
   };
 
-  const RenderRecipes = ({ item }) => (
-    <TouchableOpacity
-      underlayColor="rgba(73,182,77,0.9)"
-      onPress={() => onPressRecipe(item)}
-    >
+  const RenderRecipes = ({ item }) => {
+    const { name } = getCategoryById(item.categoryId);
+    return (
       <TouchableOpacity
         underlayColor="rgba(73,182,77,0.9)"
         onPress={() => onPressRecipe(item)}
       >
-        <View style={styles.container}>
-          <Image style={styles.photo} source={{ uri: item.photo_url }} />
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.category}>
-            {getCategoryName(item.categoryId)}
-          </Text>
-        </View>
+        <TouchableOpacity
+          underlayColor="rgba(73,182,77,0.9)"
+          onPress={() => onPressRecipe(item)}
+        >
+          <View style={styles.container}>
+            <Image style={styles.photo} source={{ uri: item.photo_url }} />
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.category}>{name}</Text>
+          </View>
+        </TouchableOpacity>
       </TouchableOpacity>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   return (
     <ScrollView>
@@ -71,19 +72,23 @@ export default function IngredientScreen(props) {
       >
         <Image
           style={styles.photoIngredient}
-          source={{ uri: "" + ingredientUrl }}
+          source={{ uri: "" + photo_url }}
         />
       </View>
       <Text style={styles.ingredientInfo}>Recipes with {ingredientName}:</Text>
       <View>
-        <FlatList
-          vertical
-          showsVerticalScrollIndicator={false}
-          numColumns={2}
-          data={getRecipesByIngredient(ingredientId)}
-          renderItem={RenderRecipes}
-          keyExtractor={(item) => `${item.recipeId}`}
-        />
+        {isLoading ? (
+          <Text>Loading</Text>
+        ) : (
+          <FlatList
+            vertical
+            showsVerticalScrollIndicator={false}
+            numColumns={2}
+            data={RecipeByIngerdientIdData.recipesArray}
+            renderItem={RenderRecipes}
+            keyExtractor={(item) => `${item.recipeId}`}
+          />
+        )}
       </View>
     </ScrollView>
   );
