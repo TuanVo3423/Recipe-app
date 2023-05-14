@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getRecipeByIngerdientId } from "../../api/getRecipes";
 import useIngredientsStore from "../../stores/useIngredientsStore";
 import useCategoriesStore from "../../stores/useCategoriesStore";
+import Spinner from "react-native-loading-spinner-overlay";
 
 export default function IngredientScreen(props) {
   const { navigation, route } = props;
@@ -78,7 +79,7 @@ export default function IngredientScreen(props) {
       <Text style={styles.ingredientInfo}>Recipes with {ingredientName}:</Text>
       <View>
         {isLoading ? (
-          <Text>Loading</Text>
+          <Spinner visible={isLoading} />
         ) : (
           <FlatList
             vertical

@@ -19,6 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import getIngredients from "../../api/getIngredients";
 import useIngredientsStore from "../../stores/useIngredientsStore";
 import getCategories from "../../api/getCategories";
+import Spinner from "react-native-loading-spinner-overlay";
 
 export default function HomeScreen(props) {
   const { navigation } = props;
@@ -113,9 +114,7 @@ export default function HomeScreen(props) {
     );
   };
   if (isLoading) {
-    return (
-      <ImageBackground source="../../../assets/adaptive-icon.png"></ImageBackground>
-    );
+    return <Spinner visible={isLoading} textContent={"Loading..."} />;
   } else {
     return (
       <View>

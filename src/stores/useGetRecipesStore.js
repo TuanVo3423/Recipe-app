@@ -14,17 +14,15 @@ const useGetRecipesStore = create((set, get) => ({
     });
     return count;
   },
-  // getRecipesByRecipeName: (recipeName) => {
-  //   const nameUpper = recipeName.toUpperCase();
-  //   const recipesArray = [];
-  //   const recipeStoreBase = get().recipesStore;
-  //   recipeStoreBase.map((data) => {
-  //     if (data.title.toUpperCase().includes(nameUpper)) {
-  //       recipesArray.push(data);
-  //     }
-  //   });
-  //   return recipesArray;
-  // },
+  getRecipesById: (recipeId) => {
+    const recipeStoreBase = get().recipesStore;
+    recipeStoreBase.map((data) => {
+      if (data.recipeId == recipeId) {
+        
+      }
+    });
+    return recipesArray;
+  },
   // getRecipesByCategoryName: (categoryName, categories) => {
   //   const nameUpper = categoryName.toUpperCase();
   //   const recipesArray = [];
