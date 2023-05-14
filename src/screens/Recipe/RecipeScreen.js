@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import {
   ScrollView,
   Text,
@@ -10,15 +10,37 @@ import {
 import styles from "./styles";
 import Carousel, { Pagination } from "react-native-snap-carousel";
 import BackButton from "../../components/BackButton/BackButton";
-import ViewIngredientsButton from "../../components/ViewIngredientsButton/ViewIngredientsButton";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getCategoryById } from "../../api/getCategories";
+import { Box, Button, Flex, useToast } from "native-base";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createFavorite } from "../../api/getFavorite";
+import Spinner from "react-native-loading-spinner-overlay";
 
 const { width: viewportWidth } = Dimensions.get("window");
 
 export default function RecipeScreen(props) {
+  const toast = useToast();
+  const [id, setId] = useState();
+  AsyncStorage.getItem("userId").then((res) => setId(res));
   const { navigation, route } = props;
   const item = route.params?.item;
+  const mutation = useMutation({
+    mutationFn: () => createFavorite(id, item.recipeId),
+    onError: (err) => console.log(err),
+    onSuccess: (res) =>
+      toast.show({
+        render: () => {
+          return (
+            <Box bg="green.500" px="5" py="3" rounded="md" mb={5}>
+              <Text color="white">{res.message}</Text>
+            </Box>
+          );
+        },
+        duration: 2000,
+        isClosable: true,
+      }),
+  });
   const { isLoading, isError, data, error } = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
@@ -60,10 +82,11 @@ export default function RecipeScreen(props) {
   //   navigation.navigate("Ingredient", { ingredient, name });
   // };
   if (isLoading) {
-    return <Text>Loading</Text>;
+    return <Spinner visible={isLoading} textContent={"Loading..."} />;
   } else {
     return (
       <ScrollView style={styles.container}>
+        <Spinner visible={mutation.isLoading} textContent={"Loading..."} />
         <View style={styles.carouselContainer}>
           <View style={styles.carousel}>
             <Carousel
@@ -113,8 +136,8 @@ export default function RecipeScreen(props) {
             <Text style={styles.infoRecipe}>{item.time} minutes </Text>
           </View>
 
-          <View style={styles.infoContainer}>
-            <ViewIngredientsButton
+          <Flex w="100%" mt={4} justify="center" align="center">
+            <Button
               onPress={() => {
                 let ingredients = item.ingredients;
                 let title = "Ingredients for " + item.title;
@@ -123,8 +146,28 @@ export default function RecipeScreen(props) {
                   title,
                 });
               }}
-            />
-          </View>
+              w="200px"
+              variant="outline"
+              borderColor="#2cd18a"
+              borderRadius="full"
+              colorScheme="rgba(73,182,77,0.9)"
+              color="#2cd18a"
+              mb={2}
+            >
+              See the ingredients
+            </Button>
+            <Button
+              onPress={() => mutation.mutate()}
+              w="200px"
+              variant="outline"
+              borderColor="#2cd18a"
+              borderRadius="full"
+              colorScheme="rgba(73,182,77,0.9)"
+              color="#2cd18a"
+            >
+              Add to favorite
+            </Button>
+          </Flex>
           <View style={styles.infoContainer}>
             <Text style={styles.infoDescriptionRecipe}>{item.description}</Text>
           </View>

@@ -4,6 +4,7 @@ import styles from "./styles";
 import { useQuery } from "@tanstack/react-query";
 import { getRecipeByCategoryId } from "../../api/getRecipes";
 import useCategoriesStore from "../../stores/useCategoriesStore";
+import Spinner from "react-native-loading-spinner-overlay";
 
 export default function RecipesListScreen(props) {
   const { navigation, route } = props;
@@ -11,6 +12,7 @@ export default function RecipesListScreen(props) {
   const {
     data: recipeListData,
     isLoading,
+    isFetching,
     isError,
   } = useQuery({
     queryKey: ["recipesList"],
@@ -46,9 +48,8 @@ export default function RecipesListScreen(props) {
 
   return (
     <View>
-      {!recipeListData ? (
-        <Text>Loading</Text>
-      ) : (
+      <Spinner visible={isFetching} textContent={"Loading..."} />
+      {!isFetching && (
         <FlatList
           vertical
           showsVerticalScrollIndicator={false}

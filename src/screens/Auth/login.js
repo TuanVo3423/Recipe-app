@@ -67,7 +67,9 @@ export default function LoginScreen(props) {
               console.log("Error retrieving data: ", error);
             } else {
               AsyncStorage.setItem("name", input.username, (error) => {
-                navigation.navigate("Home", res.message);
+                AsyncStorage.setItem("userId", res.data._id, (error) => {
+                  navigation.navigate("Home", res.message);
+                });
               });
             }
           });
